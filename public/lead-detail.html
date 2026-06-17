@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Detail - Proceeds Navigator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ink: #0c0f14;
+            --slate: #1a1f2e;
+            --card: #141823;
+            --border: #2a3042;
+            --muted: #6b7394;
+            --body: #a0a8c4;
+            --light: #d4daf0;
+            --white: #f0f2fa;
+            --gold: #c8a44e;
+            --gold-light: #e8cc72;
+            --gold-dim: rgba(200, 164, 78, 0.12);
+            --amber-glow: rgba(200, 164, 78, 0.06);
+            --green: #4ade80;
+            --green-dim: rgba(74, 222, 128, 0.12);
+            --blue: #60a5fa;
+            --blue-dim: rgba(96, 165, 250, 0.12);
+            --red: #f87171;
+            --red-dim: rgba(248, 113, 113, 0.12);
+            --orange: #fb923c;
+            --orange-dim: rgba(251, 146, 60, 0.12);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink); color: var(--body);
+            line-height: 1.6; overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--white); line-height: 1.2;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(12, 15, 20, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-left { display: flex; align-items: center; gap: 1.5rem; }
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.1rem; color: var(--white);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 0.6rem;
+        }
+        .logo-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; color: var(--ink); font-weight: 700;
+        }
+        .nav-links { display: flex; gap: 0.25rem; }
+        .nav-links a {
+            font-size: 0.82rem; color: var(--muted);
+            text-decoration: none; padding: 0.4rem 0.75rem;
+            border-radius: 6px; transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--light); background: var(--gold-dim); }
+        .nav-links a.active { color: var(--gold); background: var(--gold-dim); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .nav-tag {
+            font-size: 0.7rem; font-weight: 500; color: var(--gold);
+            background: var(--gold-dim); padding: 0.3rem 0.7rem;
+            border-radius: 99px; letter-spacing: 0.04em; text-transform: uppercase;
+        }
+
+        /* ── LAYOUT ── */
+        .page { padding: 5.5rem 2rem 3rem; max-width: 1000px; margin: 0 auto; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--muted); text-decoration: none; font-size: 0.85rem;
+            margin-bottom: 1.5rem; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--gold); }
+
+        /* ── HEADER CARD ── */
+        .lead-header {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem;
+            position: relative; overflow: hidden;
+        }
+        .lead-header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light), transparent);
+        }
+        .lead-header-top {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .lead-title-area h1 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+        .lead-title-area .lead-apn {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem; color: var(--muted);
+        }
+        .lead-score-big {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem; font-weight: 700; line-height: 1;
+        }
+        .lead-score-label {
+            font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted); text-align: right;
+        }
+        .score-high { color: var(--green); }
+        .score-mid { color: var(--gold-light); }
+        .score-low { color: var(--red); }
+
+        .lead-meta {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+        }
+        .meta-item {}
+        .meta-label {
+            font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.2rem;
+        }
+        .meta-value { font-size: 0.95rem; color: var(--light); font-weight: 500; }
+        .meta-value.gold {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; color: var(--gold-light); font-size: 1.15rem;
+        }
+
+        /* ── STATUS PIPELINE ── */
+        .status-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem;
+        }
+        .status-section h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+        .status-pipeline {
+            display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;
+        }
+        .status-step {
+            flex: 1; min-width: 100px; text-align: center;
+            padding: 0.65rem 0.5rem; border-radius: 8px;
+            font-size: 0.78rem; font-weight: 600; text-transform: capitalize;
+            cursor: pointer; transition: all 0.2s;
+            border: 1px solid var(--border);
+            color: var(--muted); background: transparent;
+        }
+        .status-step:hover { border-color: var(--gold); color: var(--gold); }
+        .status-step.active {
+            background: var(--gold-dim); border-color: var(--gold); color: var(--gold);
+        }
+        .status-step.completed {
+            background: var(--green-dim); border-color: var(--green); color: var(--green);
+        }
+        .status-step.dead-active {
+            background: var(--red-dim); border-color: var(--red); color: var(--red);
+        }
+        .pipeline-connector {
+            display: flex; align-items: center; color: var(--border);
+            font-size: 0.7rem; flex-shrink: 0;
+        }
+
+        /* ── CONTACT INFO SECTION ── */
+        .contact-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem;
+        }
+        .contact-section h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+        .contact-fields {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        }
+        .contact-field { display: flex; flex-direction: column; gap: 0.3rem; }
+        .contact-field label {
+            font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--muted);
+        }
+        .contact-field input, .contact-field select {
+            background: var(--slate); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.6rem 0.75rem;
+            color: var(--light); font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem; outline: none; transition: border-color 0.2s;
+        }
+        .contact-field input:focus, .contact-field select:focus { border-color: var(--gold); }
+        .contact-field.full { grid-column: 1 / -1; }
+        .contact-field textarea {
+            background: var(--slate); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.6rem 0.75rem;
+            color: var(--light); font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem; outline: none; resize: vertical; min-height: 60px;
+            transition: border-color 0.2s;
+        }
+        .contact-field textarea:focus { border-color: var(--gold); }
+        .contact-actions {
+            display: flex; align-items: center; gap: 0.75rem;
+            margin-top: 1.25rem;
+        }
+        .contact-save-msg {
+            font-size: 0.78rem; color: var(--green); display: none;
+        }
+        .contact-save-msg.visible { display: inline; }
+
+        /* ── CLAIM LETTER BUTTON ── */
+        .claim-letter-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.85rem; font-weight: 600; letter-spacing: 0.02em;
+            padding: 0.6rem 1.3rem;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--ink); border: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .claim-letter-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .claim-letter-btn:active { transform: translateY(0); }
+        .claim-letter-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+        .claim-letter-row {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0.5rem;
+        }
+        .claim-letter-stamp {
+            font-size: 0.75rem; color: var(--muted);
+        }
+        .claim-letter-stamp .stamp-val { color: var(--green); font-weight: 500; }
+
+        /* ── LETTERS HISTORY ── */
+        .letters-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; margin-top: 1.5rem;
+        }
+        .letters-section h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+        .letters-list { display: flex; flex-direction: column; gap: 0; }
+        .letter-item {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 0.5rem;
+            padding: 0.85rem 0; border-bottom: 1px solid rgba(42, 48, 66, 0.5);
+        }
+        .letter-item:last-child { border-bottom: none; }
+        .letter-item-left { display: flex; align-items: center; gap: 0.75rem; }
+        .letter-status-badge {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; padding: 0.2rem 0.55rem; border-radius: 4px;
+        }
+        .lbadge-draft { background: var(--blue-dim); color: var(--blue); }
+        .lbadge-sent { background: var(--green-dim); color: var(--green); }
+        .lbadge-returned { background: var(--red-dim); color: var(--red); }
+        .letter-date { font-size: 0.82rem; color: var(--muted); }
+        .letter-item-actions { display: flex; gap: 0.4rem; }
+        .letter-action-btn {
+            font-size: 0.72rem; padding: 0.25rem 0.65rem;
+            border-radius: 6px; border: 1px solid var(--border);
+            background: transparent; color: var(--muted); cursor: pointer;
+            transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+        }
+        .letter-action-btn:hover { border-color: var(--gold); color: var(--gold); }
+        .letter-action-btn.preview { border-color: var(--blue); color: var(--blue); }
+        .letter-action-btn.preview:hover { background: var(--blue-dim); }
+        .empty-letters { text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.88rem; }
+
+        /* ── BADGE ── */
+        .badge {
+            display: inline-block; font-size: 0.72rem; font-weight: 600;
+            padding: 0.25rem 0.65rem; border-radius: 99px;
+            text-transform: capitalize;
+        }
+        .badge-new { background: var(--blue-dim); color: var(--blue); }
+        .badge-contacted { background: var(--gold-dim); color: var(--gold); }
+        .badge-engaged { background: var(--orange-dim); color: var(--orange); }
+        .badge-filed { background: var(--green-dim); color: var(--green); }
+        .badge-recovered { background: rgba(74, 222, 128, 0.2); color: #22c55e; }
+        .badge-dead { background: rgba(107, 115, 148, 0.15); color: var(--muted); }
+
+        /* ── TWO COLUMNS ── */
+        .detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+        }
+
+        /* ── NOTES SECTION ── */
+        .notes-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem;
+        }
+        .notes-section h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+        .note-input-area { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .note-input-area textarea {
+            flex: 1; background: var(--slate); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.7rem 0.9rem;
+            color: var(--light); font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem; resize: vertical; min-height: 50px; outline: none;
+        }
+        .note-input-area textarea:focus { border-color: var(--gold); }
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem; font-weight: 500;
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px; border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--ink); border: none; font-weight: 600;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-ghost {
+            background: transparent; color: var(--body); border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+        .notes-list { display: flex; flex-direction: column; gap: 0; }
+        .note-item {
+            padding: 1rem 0; border-bottom: 1px solid rgba(42, 48, 66, 0.5);
+        }
+        .note-item:last-child { border-bottom: none; }
+        .note-meta {
+            display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem;
+        }
+        .note-type {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.06em; padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+        }
+        .note-type-note { background: var(--blue-dim); color: var(--blue); }
+        .note-type-status_change { background: var(--gold-dim); color: var(--gold); }
+        .note-type-contact { background: var(--green-dim); color: var(--green); }
+        .note-type-document { background: var(--orange-dim); color: var(--orange); }
+        .note-type-system { background: rgba(107,115,148,0.15); color: var(--muted); }
+        .note-time { font-size: 0.75rem; color: var(--muted); }
+        .note-text { font-size: 0.9rem; color: var(--light); line-height: 1.6; }
+
+        .empty-notes {
+            text-align: center; padding: 2rem;
+            color: var(--muted); font-size: 0.88rem;
+        }
+
+        /* ── LEAD INFO CARD ── */
+        .info-section {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem;
+        }
+        .info-section h3 { font-size: 1rem; margin-bottom: 1.25rem; }
+        .info-row {
+            display: flex; justify-content: space-between;
+            padding: 0.65rem 0; border-bottom: 1px solid rgba(42, 48, 66, 0.4);
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-key {
+            font-size: 0.82rem; color: var(--muted); text-transform: uppercase;
+            letter-spacing: 0.04em; font-weight: 500;
+        }
+        .info-val { font-size: 0.88rem; color: var(--light); text-align: right; max-width: 60%; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            .page { padding: 5rem 1rem 2rem; }
+            .lead-header-top { flex-direction: column; }
+            .lead-meta { grid-template-columns: 1fr 1fr; }
+            .status-pipeline { flex-direction: column; }
+            .pipeline-connector { display: none; }
+        }
+    </style>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1426048922626065');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1426048922626065&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="logo">
+                <div class="logo-icon">PN</div>
+                Proceeds Navigator
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/counties">County Reference</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="nav-tag">San Diego County</span>
+        </div>
+    </nav>
+
+    <div class="page" id="page-content">
+        <a href="/dashboard" class="back-link">&larr; Back to Dashboard</a>
+
+        <!-- Header Card -->
+        <div class="lead-header" id="lead-header">
+            <div class="lead-header-top">
+                <div class="lead-title-area">
+                    <h1 id="lead-name">Loading...</h1>
+                    <div class="lead-apn" id="lead-apn"></div>
+                </div>
+                <div>
+                    <div class="lead-score-big" id="lead-score">-</div>
+                    <div class="lead-score-label">Lead Score</div>
+                </div>
+            </div>
+            <div class="lead-meta" id="lead-meta"></div>
+        </div>
+
+        <!-- Status Transitions -->
+        <div class="status-section">
+            <h3>Case Status</h3>
+            <div class="status-pipeline" id="status-pipeline"></div>
+        </div>
+
+        <!-- Contact Info Section -->
+        <div class="contact-section">
+            <h3>Contact Info</h3>
+            <div class="contact-fields">
+                <div class="contact-field">
+                    <label>Email</label>
+                    <input type="email" id="contact-email" placeholder="claimant@example.com">
+                </div>
+                <div class="contact-field">
+                    <label>Phone</label>
+                    <input type="text" id="contact-phone" placeholder="(619) 555-0100">
+                </div>
+                <div class="contact-field full">
+                    <label>Mailing Address</label>
+                    <textarea id="contact-mailing-address" placeholder="Street address, City, State, ZIP"></textarea>
+                </div>
+                <div class="contact-field">
+                    <label>Contact Source</label>
+                    <select id="contact-source">
+                        <option value="">— select —</option>
+                        <option value="manual">Manual Entry</option>
+                        <option value="skip_trace">Skip Trace</option>
+                        <option value="public_record">Public Record</option>
+                    </select>
+                </div>
+            </div>
+            <div class="contact-actions">
+                <button class="btn btn-primary" onclick="saveContactInfo()">Save Contact</button>
+                <span class="contact-save-msg" id="contact-save-msg">&#10003; Saved</span>
+            </div>
+        </div>
+
+        <!-- Claim Letter Row -->
+        <div class="claim-letter-row" id="claim-letter-row">
+            <div>
+                <div class="claim-letter-stamp" id="claim-letter-stamp"></div>
+            </div>
+            <button class="claim-letter-btn" id="claim-letter-btn" onclick="generateClaimLetter()">
+                &#128438; Generate Claim Letter
+            </button>
+        </div>
+
+        <!-- Letters History -->
+        <div class="letters-section" id="letters-section">
+            <h3>&#128233; Generated Letters</h3>
+            <div class="letters-list" id="letters-list">
+                <div class="empty-letters">Loading…</div>
+            </div>
+        </div>
+
+        <!-- Two Columns -->
+        <div class="detail-grid">
+            <!-- Notes -->
+            <div class="notes-section">
+                <h3>Case Notes</h3>
+                <div class="note-input-area">
+                    <textarea id="note-input" placeholder="Add a note about this case..."></textarea>
+                    <button class="btn btn-primary" onclick="addNote()" style="align-self:flex-end;">Add</button>
+                </div>
+                <div class="notes-list" id="notes-list">
+                    <div class="empty-notes">Loading notes...</div>
+                </div>
+            </div>
+
+            <!-- Lead Info -->
+            <div class="info-section">
+                <h3>Lead Details</h3>
+                <div id="lead-info"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const leadId = window.location.pathname.split('/').pop();
+        let currentLead = null;
+
+        const statusFlow = ['new', 'contacted', 'engaged', 'filed', 'recovered'];
+
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str || '';
+            return d.innerHTML;
+        }
+
+        function fmtDate(d) {
+            if (!d) return '-';
+            return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function fmtMoney(v) {
+            if (!v) return '-';
+            return '$' + Number(v).toLocaleString();
+        }
+
+        function scoreClass(s) {
+            return s >= 80 ? 'score-high' : s >= 50 ? 'score-mid' : 'score-low';
+        }
+
+        async function loadLead() {
+            try {
+                const res = await fetch(`/api/leads/${leadId}`);
+                if (!res.ok) throw new Error('Not found');
+                currentLead = await res.json();
+                renderLead();
+            } catch (e) {
+                document.getElementById('page-content').innerHTML =
+                    '<div style="text-align:center;padding:6rem 2rem;"><h2 style="color:var(--white);margin-bottom:0.5rem;">Lead not found</h2><a href="/dashboard" class="back-link">Back to Dashboard</a></div>';
+            }
+        }
+
+        function renderLead() {
+            const l = currentLead;
+            document.title = `${l.claimant_name || 'Lead'} - Proceeds Navigator`;
+
+            document.getElementById('lead-name').textContent = l.claimant_name || 'Unknown Claimant';
+            document.getElementById('lead-apn').textContent = `APN: ${l.apn} | ${l.county} County`;
+            document.getElementById('lead-score').textContent = l.score;
+            document.getElementById('lead-score').className = `lead-score-big ${scoreClass(l.score)}`;
+
+            document.getElementById('lead-meta').innerHTML = `
+                <div class="meta-item"><div class="meta-label">Excess Amount</div><div class="meta-value gold">${fmtMoney(l.excess_amount)}</div></div>
+                <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value"><span class="badge badge-${l.status}">${l.status}</span></div></div>
+                <div class="meta-item"><div class="meta-label">Sale Date</div><div class="meta-value">${fmtDate(l.sale_date)}</div></div>
+                <div class="meta-item"><div class="meta-label">Claim Deadline</div><div class="meta-value">${fmtDate(l.deadline)}</div></div>
+            `;
+
+            // Status pipeline
+            const pipeline = document.getElementById('status-pipeline');
+            const allStatuses = [...statusFlow, 'dead'];
+            const currentIdx = statusFlow.indexOf(l.status);
+
+            pipeline.innerHTML = allStatuses.map((s, i) => {
+                let cls = 'status-step';
+                if (s === l.status) {
+                    cls += s === 'dead' ? ' dead-active' : ' active';
+                } else if (s !== 'dead' && currentIdx >= 0 && i < currentIdx) {
+                    cls += ' completed';
+                }
+                const connector = (i < allStatuses.length - 1 && s !== 'recovered')
+                    ? '<div class="pipeline-connector">&#9654;</div>' : '';
+                return `<button class="${cls}" onclick="transitionTo('${s}')" ${s === l.status ? 'disabled' : ''}>${s}</button>${connector}`;
+            }).join('');
+
+            // Claim letter stamp
+            updateClaimLetterStamp();
+
+            // Populate contact fields
+            document.getElementById('contact-email').value = l.email || '';
+            document.getElementById('contact-phone').value = l.phone || '';
+            document.getElementById('contact-mailing-address').value = l.mailing_address || '';
+            document.getElementById('contact-source').value = l.contact_source || '';
+
+            // Lead info sidebar
+            document.getElementById('lead-info').innerHTML = `
+                <div class="info-row"><span class="info-key">County</span><span class="info-val">${esc(l.county)} <a href="/counties" style="font-size:0.75rem;color:var(--gold);margin-left:0.5rem;text-decoration:none;">&#8594; View County Info</a></span></div>
+                <div class="info-row"><span class="info-key">APN</span><span class="info-val">${esc(l.apn)}</span></div>
+                <div class="info-row"><span class="info-key">Property</span><span class="info-val">${esc(l.property_address || '-')}</span></div>
+                <div class="info-row"><span class="info-key">Excess</span><span class="info-val" style="color:var(--gold-light);font-weight:600;">${fmtMoney(l.excess_amount)}</span></div>
+                <div class="info-row"><span class="info-key">Sale Date</span><span class="info-val">${fmtDate(l.sale_date)}</span></div>
+                <div class="info-row"><span class="info-key">Deadline</span><span class="info-val">${fmtDate(l.deadline)}</span></div>
+                <div class="info-row"><span class="info-key">Score</span><span class="info-val ${scoreClass(l.score)}" style="font-weight:700;">${l.score}</span></div>
+                <div class="info-row"><span class="info-key">Created</span><span class="info-val">${fmtDate(l.created_at)}</span></div>
+                <div class="info-row"><span class="info-key">Updated</span><span class="info-val">${fmtDate(l.updated_at)}</span></div>
+                <div class="info-row"><span class="info-key">Letter Generated</span><span class="info-val" style="color:${l.claim_letter_generated_at ? 'var(--green)' : 'var(--muted)'};">${l.claim_letter_generated_at ? fmtDate(l.claim_letter_generated_at) : '—'}</span></div>
+                ${l.notes ? `<div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);"><div class="info-key" style="margin-bottom:0.4rem;">Notes</div><div style="font-size:0.88rem;color:var(--body);line-height:1.6;">${esc(l.notes)}</div></div>` : ''}
+            `;
+        }
+
+        async function transitionTo(newStatus) {
+            if (!currentLead || newStatus === currentLead.status) return;
+            if (!confirm(`Move this lead to "${newStatus}"?`)) return;
+
+            try {
+                const res = await fetch(`/api/leads/${leadId}/transition`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus }),
+                });
+                if (res.ok) {
+                    currentLead = await res.json();
+                    // Fire Meta Pixel Purchase event when lead is recovered (funds collected)
+                    if (newStatus === 'recovered' && typeof fbq === 'function') {
+                        fbq('track', 'Purchase', {
+                            value: parseFloat(currentLead.excess_amount) || 0,
+                            currency: 'USD'
+                        });
+                    }
+                    renderLead();
+                    loadNotes();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to transition');
+                }
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        async function loadNotes() {
+            try {
+                const res = await fetch(`/api/leads/${leadId}/notes`);
+                const notes = res.ok ? await res.json() : [];
+                renderNotes(notes);
+            } catch (e) {
+                document.getElementById('notes-list').innerHTML =
+                    '<div class="empty-notes">Failed to load notes.</div>';
+            }
+        }
+
+        function renderNotes(notes) {
+            const container = document.getElementById('notes-list');
+            if (!notes.length) {
+                container.innerHTML = '<div class="empty-notes">No case notes yet. Add one above.</div>';
+                return;
+            }
+            container.innerHTML = notes.map(n => {
+                const time = new Date(n.created_at).toLocaleString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                return `<div class="note-item">
+                    <div class="note-meta">
+                        <span class="note-type note-type-${n.note_type}">${n.note_type.replace('_', ' ')}</span>
+                        <span class="note-time">${time}</span>
+                    </div>
+                    <div class="note-text">${esc(n.note)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addNote() {
+            const input = document.getElementById('note-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            try {
+                const res = await fetch(`/api/leads/${leadId}/notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ note: text, note_type: 'note' }),
+                });
+                if (res.ok) {
+                    input.value = '';
+                    loadNotes();
+                } else {
+                    alert('Failed to add note');
+                }
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        // Enter key in note input
+        document.getElementById('note-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addNote(); }
+        });
+
+        async function generateClaimLetter() {
+            const btn = document.getElementById('claim-letter-btn');
+            btn.disabled = true;
+            btn.textContent = 'Generating…';
+            try {
+                const res = await fetch(`/api/leads/${leadId}/generate-letter`, { method: 'POST' });
+                if (!res.ok) {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to generate letter');
+                    return;
+                }
+                const data = await res.json();
+                currentLead.claim_letter_generated_at = data.generated_at;
+                updateClaimLetterStamp();
+                loadLetters();
+
+                // Open letter HTML in new tab via blob
+                const blob = new Blob([data.html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                window.open(url, '_blank');
+            } catch (e) {
+                alert('Error: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '&#128438; Generate Claim Letter';
+            }
+        }
+
+        function updateClaimLetterStamp() {
+            const stamp = document.getElementById('claim-letter-stamp');
+            if (!stamp) return;
+            if (currentLead && currentLead.claim_letter_generated_at) {
+                const when = new Date(currentLead.claim_letter_generated_at).toLocaleString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                stamp.innerHTML = `Last generated: <span class="stamp-val">${when}</span>`;
+            } else {
+                stamp.innerHTML = `<span style="color:var(--muted);">No letter generated yet</span>`;
+            }
+        }
+
+        async function loadLetters() {
+            try {
+                const res = await fetch(`/api/leads/${leadId}/letters`);
+                const letters = res.ok ? await res.json() : [];
+                renderLetters(letters);
+            } catch (e) {
+                document.getElementById('letters-list').innerHTML =
+                    '<div class="empty-letters">Failed to load letters.</div>';
+            }
+        }
+
+        function renderLetters(letters) {
+            const container = document.getElementById('letters-list');
+            if (!letters.length) {
+                container.innerHTML = '<div class="empty-letters">No letters generated yet. Click "Generate Claim Letter" above.</div>';
+                return;
+            }
+            container.innerHTML = letters.map(l => {
+                const when = new Date(l.generated_at).toLocaleString('en-US', {
+                    month: 'short', day: 'numeric', year: 'numeric',
+                    hour: 'numeric', minute: '2-digit'
+                });
+                const statusActions = l.status === 'draft'
+                    ? `<button class="letter-action-btn" onclick="updateLetterStatus(${l.id}, 'sent')">Mark Sent</button>`
+                    : l.status === 'sent'
+                    ? `<button class="letter-action-btn" onclick="updateLetterStatus(${l.id}, 'returned')">Mark Returned</button>`
+                    : '';
+                return `<div class="letter-item" id="letter-item-${l.id}">
+                    <div class="letter-item-left">
+                        <span class="letter-status-badge lbadge-${l.status}">${l.status}</span>
+                        <span class="letter-date">${when}</span>
+                    </div>
+                    <div class="letter-item-actions">
+                        <button class="letter-action-btn preview" onclick="previewLetter(${l.id})">&#128065; Preview</button>
+                        ${statusActions}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function previewLetter(letterId) {
+            // Fetch HTML from server and open in new tab
+            try {
+                const res = await fetch(`/api/leads/${leadId}/letter-preview`);
+                if (!res.ok) { alert('Could not load letter preview'); return; }
+                const html = await res.text();
+                const blob = new Blob([html], { type: 'text/html' });
+                window.open(URL.createObjectURL(blob), '_blank');
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        async function updateLetterStatus(letterId, status) {
+            try {
+                const res = await fetch(`/api/leads/${leadId}/letters/${letterId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status }),
+                });
+                if (res.ok) {
+                    loadLetters();
+                } else {
+                    const err = await res.json();
+                    alert(err.error || 'Failed to update status');
+                }
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        async function saveContactInfo() {
+            if (!currentLead) return;
+            const email = document.getElementById('contact-email').value.trim() || null;
+            const phone = document.getElementById('contact-phone').value.trim() || null;
+            const mailingAddress = document.getElementById('contact-mailing-address').value.trim() || null;
+            const contactSource = document.getElementById('contact-source').value || null;
+
+            try {
+                const res = await fetch(`/api/leads/${leadId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        // Preserve all existing fields
+                        county: currentLead.county,
+                        apn: currentLead.apn,
+                        sale_date: currentLead.sale_date,
+                        excess_amount: currentLead.excess_amount,
+                        claimant_name: currentLead.claimant_name,
+                        property_address: currentLead.property_address,
+                        score: currentLead.score,
+                        status: currentLead.status,
+                        deadline: currentLead.deadline,
+                        notes: currentLead.notes,
+                        // Updated contact fields
+                        email,
+                        phone,
+                        mailing_address: mailingAddress,
+                        contact_source: contactSource,
+                    }),
+                });
+                if (res.ok) {
+                    currentLead = await res.json();
+                    const msg = document.getElementById('contact-save-msg');
+                    msg.classList.add('visible');
+                    setTimeout(() => msg.classList.remove('visible'), 2500);
+                } else {
+                    alert('Failed to save contact info');
+                }
+            } catch (e) { alert('Error: ' + e.message); }
+        }
+
+        // ── Init ──
+        loadLead();
+        loadNotes();
+        loadLetters();
+    </script>
+</body>
+</html>

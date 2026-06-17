@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Proceeds Navigator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ink: #0c0f14;
+            --slate: #1a1f2e;
+            --card: #141823;
+            --border: #2a3042;
+            --muted: #6b7394;
+            --body: #a0a8c4;
+            --light: #d4daf0;
+            --white: #f0f2fa;
+            --gold: #c8a44e;
+            --gold-light: #e8cc72;
+            --gold-dim: rgba(200, 164, 78, 0.12);
+            --amber-glow: rgba(200, 164, 78, 0.06);
+            --green: #4ade80;
+            --green-dim: rgba(74, 222, 128, 0.12);
+            --blue: #60a5fa;
+            --blue-dim: rgba(96, 165, 250, 0.12);
+            --red: #f87171;
+            --red-dim: rgba(248, 113, 113, 0.12);
+            --orange: #fb923c;
+            --orange-dim: rgba(251, 146, 60, 0.12);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--ink);
+            color: var(--body);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4, h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--white);
+            line-height: 1.2;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(12, 15, 20, 0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-left { display: flex; align-items: center; gap: 1.5rem; }
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 1.1rem; color: var(--white);
+            text-decoration: none;
+            display: flex; align-items: center; gap: 0.6rem;
+        }
+        .logo-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; color: var(--ink); font-weight: 700;
+        }
+        .nav-links { display: flex; gap: 0.25rem; }
+        .nav-links a {
+            font-size: 0.82rem; color: var(--muted);
+            text-decoration: none; padding: 0.4rem 0.75rem;
+            border-radius: 6px; transition: all 0.2s;
+        }
+        .nav-links a:hover { color: var(--light); background: var(--gold-dim); }
+        .nav-links a.active { color: var(--gold); background: var(--gold-dim); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .nav-tag {
+            font-size: 0.7rem; font-weight: 500; color: var(--gold);
+            background: var(--gold-dim); padding: 0.3rem 0.7rem;
+            border-radius: 99px; letter-spacing: 0.04em; text-transform: uppercase;
+        }
+
+        /* ── LAYOUT ── */
+        .page { padding: 5rem 2rem 2rem; max-width: 1280px; margin: 0 auto; }
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .page-header h1 { font-size: 1.6rem; font-weight: 700; }
+
+        /* ── ANALYTICS BAR ── */
+        .analytics-bar {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; margin-bottom: 1.25rem;
+            overflow: hidden;
+        }
+        .analytics-sections {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 1.6fr 0.8fr 1.2fr;
+            divide-x: 1px solid var(--border);
+        }
+        .analytics-section {
+            padding: 1.1rem 1.4rem;
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; gap: 0.35rem;
+        }
+        .analytics-section:last-child { border-right: none; }
+        .analytics-label {
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.09em;
+            color: var(--muted); font-weight: 500;
+        }
+        .analytics-main {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.55rem; font-weight: 700; color: var(--white);
+            line-height: 1;
+        }
+        .analytics-main.gold { color: var(--gold-light); }
+        .analytics-main.green { color: var(--green); }
+        .analytics-sub {
+            font-size: 0.75rem; color: var(--muted); margin-top: 0.1rem;
+        }
+        /* Tier pills row */
+        .tier-row {
+            display: flex; gap: 0.45rem; flex-wrap: wrap; margin-top: 0.15rem;
+        }
+        .tier-pill {
+            font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.55rem;
+            border-radius: 99px; white-space: nowrap;
+        }
+        .tier-high { background: var(--green-dim); color: var(--green); }
+        .tier-mid { background: var(--gold-dim); color: var(--gold-light); }
+        .tier-low { background: var(--red-dim); color: var(--red); }
+        /* Status mini-row */
+        .status-row {
+            display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.15rem;
+        }
+        .status-chip {
+            display: flex; align-items: center; gap: 0.3rem;
+            font-size: 0.72rem; color: var(--body);
+        }
+        .status-chip strong {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.82rem; color: var(--light); font-weight: 600;
+        }
+        /* Deadline alert pills */
+        .deadline-row {
+            display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.1rem;
+        }
+        .deadline-item {
+            display: flex; align-items: center; justify-content: space-between;
+            font-size: 0.74rem;
+        }
+        .deadline-window { color: var(--muted); }
+        .deadline-count {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700; font-size: 0.82rem;
+        }
+        .deadline-count.urgent { color: var(--red); }
+        .deadline-count.warn { color: var(--orange); }
+        .deadline-count.ok { color: var(--gold-light); }
+
+        /* ── STATS ROW ── */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem; margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1.25rem 1.5rem;
+        }
+        .stat-label {
+            font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--muted); margin-bottom: 0.4rem;
+        }
+        .stat-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem; font-weight: 700; color: var(--white);
+        }
+        .stat-value.gold { color: var(--gold-light); }
+        .stat-value.green { color: var(--green); }
+
+        /* ── FILTERS ── */
+        .filters-bar {
+            display: flex; gap: 0.75rem; flex-wrap: wrap;
+            margin-bottom: 1rem; align-items: center;
+        }
+        .filter-group { display: flex; flex-direction: column; gap: 0.25rem; }
+        .filter-label {
+            font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--muted);
+        }
+        .filter-input, .filter-select {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.5rem 0.75rem;
+            color: var(--light); font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        .filter-input:focus, .filter-select:focus { border-color: var(--gold); }
+        .filter-select { cursor: pointer; }
+        .filter-select option { background: var(--slate); color: var(--light); }
+        .search-box {
+            flex: 1; min-width: 200px;
+        }
+        .search-box .filter-input { width: 100%; }
+
+        /* ── BUTTONS ── */
+        .btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem; font-weight: 500;
+            padding: 0.55rem 1.1rem;
+            border-radius: 8px; border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: var(--ink); border: none; font-weight: 600;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-ghost {
+            background: transparent; color: var(--body); border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--muted); text-align: left;
+            padding: 0.9rem 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer; user-select: none;
+            white-space: nowrap;
+        }
+        thead th:hover { color: var(--gold); }
+        thead th.sorted { color: var(--gold); }
+        thead th .sort-arrow { font-size: 0.65rem; margin-left: 0.3rem; }
+        tbody tr {
+            border-bottom: 1px solid rgba(42, 48, 66, 0.5);
+            transition: background 0.15s;
+            cursor: pointer;
+        }
+        tbody tr:hover { background: var(--amber-glow); }
+        tbody tr:last-child { border-bottom: none; }
+        td {
+            padding: 0.85rem 1rem; font-size: 0.88rem;
+            white-space: nowrap;
+        }
+        .td-name {
+            color: var(--light); font-weight: 500;
+            white-space: normal; max-width: 180px;
+        }
+        .td-apn { font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; color: var(--muted); }
+        .td-amount {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600; color: var(--gold-light);
+        }
+        .td-score {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+        }
+        .td-date { color: var(--muted); font-size: 0.82rem; }
+
+        /* Contact status dot */
+        .contact-dot {
+            display: inline-block; width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+        .contact-dot.has-contact { background: var(--green); box-shadow: 0 0 0 2px var(--green-dim); }
+        .contact-dot.no-contact { background: var(--muted); }
+
+        /* Score color coding */
+        .score-high { color: var(--green); }
+        .score-mid { color: var(--gold-light); }
+        .score-low { color: var(--red); }
+
+        /* Status badges */
+        .badge {
+            display: inline-block; font-size: 0.72rem; font-weight: 600;
+            padding: 0.25rem 0.65rem; border-radius: 99px;
+            text-transform: capitalize; letter-spacing: 0.02em;
+        }
+        .badge-new { background: var(--blue-dim); color: var(--blue); }
+        .badge-contacted { background: var(--gold-dim); color: var(--gold); }
+        .badge-engaged { background: var(--orange-dim); color: var(--orange); }
+        .badge-filed { background: var(--green-dim); color: var(--green); }
+        .badge-recovered { background: rgba(74, 222, 128, 0.2); color: #22c55e; }
+        .badge-dead { background: rgba(107, 115, 148, 0.15); color: var(--muted); }
+
+        .empty-state {
+            text-align: center; padding: 4rem 2rem;
+            color: var(--muted); font-size: 0.95rem;
+        }
+        .empty-state h3 { margin-bottom: 0.5rem; color: var(--light); }
+
+        /* ── LOADING ── */
+        .loading-shimmer {
+            background: linear-gradient(90deg, var(--card) 25%, var(--slate) 50%, var(--card) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 6px; height: 16px; width: 100%;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* ── ADD LEAD MODAL ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--slate); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; width: 90%; max-width: 520px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal h2 { font-size: 1.2rem; margin-bottom: 1.5rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+        .form-row.full { grid-template-columns: 1fr; }
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+        .form-group label {
+            font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--muted);
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.6rem 0.75rem;
+            color: var(--light); font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem; outline: none;
+        }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--gold);
+        }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+        /* ── IMPORT CSV MODAL ── */
+        .import-modal {
+            background: var(--slate); border: 1px solid var(--border);
+            border-radius: 14px; padding: 2rem; width: 90%; max-width: 560px;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .import-modal h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+        .import-modal .modal-subtitle {
+            font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem;
+        }
+        .drop-zone {
+            border: 2px dashed var(--border); border-radius: 12px;
+            padding: 2.5rem 1.5rem; text-align: center;
+            transition: all 0.2s; cursor: pointer;
+            background: var(--card);
+        }
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--gold); background: var(--gold-dim);
+        }
+        .drop-zone-icon {
+            font-size: 2.2rem; margin-bottom: 0.5rem; opacity: 0.5;
+        }
+        .drop-zone-text {
+            font-size: 0.88rem; color: var(--body); margin-bottom: 0.3rem;
+        }
+        .drop-zone-hint {
+            font-size: 0.72rem; color: var(--muted);
+        }
+        .file-selected {
+            display: flex; align-items: center; gap: 0.75rem;
+            background: var(--gold-dim); border: 1px solid rgba(200, 164, 78, 0.3);
+            border-radius: 10px; padding: 0.8rem 1rem; margin-top: 1rem;
+        }
+        .file-selected-icon { font-size: 1.3rem; }
+        .file-selected-name {
+            flex: 1; font-size: 0.85rem; color: var(--gold-light); font-weight: 500;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .file-selected-size { font-size: 0.72rem; color: var(--muted); }
+        .file-remove {
+            background: none; border: none; color: var(--muted);
+            cursor: pointer; font-size: 1.1rem; padding: 0.2rem;
+        }
+        .file-remove:hover { color: var(--red); }
+
+        /* Import progress */
+        .import-progress {
+            display: none; margin-top: 1.5rem; text-align: center;
+        }
+        .import-progress.active { display: block; }
+        .import-spinner {
+            width: 36px; height: 36px; margin: 0 auto 0.75rem;
+            border: 3px solid var(--border); border-top-color: var(--gold);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .import-progress-text {
+            font-size: 0.85rem; color: var(--muted);
+        }
+
+        /* Import results */
+        .import-results { display: none; margin-top: 1.5rem; }
+        .import-results.active { display: block; }
+        .import-results-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem; margin-bottom: 1rem;
+        }
+        .import-result-card {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 1rem; text-align: center;
+        }
+        .import-result-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem; font-weight: 700;
+        }
+        .import-result-value.imported { color: var(--green); }
+        .import-result-value.skipped { color: var(--gold-light); }
+        .import-result-value.errored { color: var(--red); }
+        .import-result-label {
+            font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--muted); margin-top: 0.2rem;
+        }
+        .import-errors-list {
+            max-height: 150px; overflow-y: auto;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.5rem 0.75rem; margin-top: 0.75rem;
+        }
+        .import-error-row {
+            font-size: 0.78rem; color: var(--red); padding: 0.25rem 0;
+            border-bottom: 1px solid rgba(42, 48, 66, 0.3);
+        }
+        .import-error-row:last-child { border-bottom: none; }
+        .import-error-row span { color: var(--muted); }
+
+        .expected-cols {
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 8px; padding: 0.75rem 1rem; margin-top: 1rem;
+        }
+        .expected-cols-title {
+            font-size: 0.72rem; text-transform: uppercase;
+            letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.4rem;
+        }
+        .expected-cols code {
+            font-size: 0.78rem; color: var(--gold);
+            background: var(--gold-dim); padding: 0.15rem 0.4rem;
+            border-radius: 4px; margin: 0.15rem 0.1rem; display: inline-block;
+        }
+
+        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 1100px) {
+            .analytics-sections { grid-template-columns: repeat(3, 1fr); }
+            .analytics-section:nth-child(3) { border-right: none; }
+            .analytics-section:nth-child(4) { border-top: 1px solid var(--border); border-right: 1px solid var(--border); }
+            .analytics-section:nth-child(5) { border-top: 1px solid var(--border); border-right: none; }
+        }
+        @media (max-width: 900px) {
+            .analytics-sections { grid-template-columns: repeat(2, 1fr); }
+            .analytics-section { border-right: none !important; border-top: none; }
+            .analytics-section:not(:first-child) { border-top: 1px solid var(--border); }
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .table-wrap { overflow-x: auto; }
+            table { min-width: 700px; }
+        }
+        @media (max-width: 600px) {
+            .analytics-sections { grid-template-columns: 1fr; }
+            .page { padding: 4.5rem 1rem 1rem; }
+            .stats-row { grid-template-columns: 1fr; }
+            nav { padding: 0.8rem 1rem; }
+            .page-header h1 { font-size: 1.3rem; }
+            .filters-bar { flex-direction: column; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1426048922626065');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1426048922626065&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+</head>
+<body>
+    <nav>
+        <div class="nav-left">
+            <a href="/" class="logo">
+                <div class="logo-icon">PN</div>
+                Proceeds Navigator
+            </a>
+            <div class="nav-links">
+                <a href="/dashboard" class="active">Dashboard</a>
+                <a href="/counties">County Reference</a>
+            </div>
+        </div>
+        <div class="nav-right">
+            <span class="nav-tag">San Diego County</span>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="page-header">
+            <h1>Lead Dashboard</h1>
+            <div class="header-actions">
+                <button class="btn btn-ghost" onclick="openImportModal()">&#8593; Import CSV</button>
+                <button class="btn btn-primary" onclick="openModal()">+ Add Lead</button>
+            </div>
+        </div>
+
+        <!-- Pipeline Analytics Bar -->
+        <div class="analytics-bar" id="analytics-bar">
+            <div class="analytics-sections">
+                <!-- 1. Pipeline Value -->
+                <div class="analytics-section">
+                    <div class="analytics-label">Total Pipeline Value</div>
+                    <div class="analytics-main gold" id="ana-pipeline">—</div>
+                    <div class="analytics-sub" id="ana-active-count">— active leads</div>
+                </div>
+                <!-- 2. Score Tiers -->
+                <div class="analytics-section">
+                    <div class="analytics-label">Leads by Score Tier</div>
+                    <div class="tier-row" id="ana-tiers">
+                        <span class="tier-pill tier-high">— High</span>
+                        <span class="tier-pill tier-mid">— Mid</span>
+                        <span class="tier-pill tier-low">— Low</span>
+                    </div>
+                    <div class="analytics-sub">70+ · 40–69 · &lt;40</div>
+                </div>
+                <!-- 3. Status Counts -->
+                <div class="analytics-section">
+                    <div class="analytics-label">Leads by Status</div>
+                    <div class="status-row" id="ana-status">
+                        <span class="status-chip"><strong id="sc-new">—</strong> New</span>
+                        <span class="status-chip"><strong id="sc-contacted">—</strong> Contacted</span>
+                        <span class="status-chip"><strong id="sc-engaged">—</strong> Engaged</span>
+                        <span class="status-chip"><strong id="sc-filed">—</strong> Filed</span>
+                        <span class="status-chip"><strong id="sc-recovered">—</strong> Recovered</span>
+                    </div>
+                </div>
+                <!-- 4. Avg Score -->
+                <div class="analytics-section">
+                    <div class="analytics-label">Avg Score</div>
+                    <div class="analytics-main green" id="ana-avg-score">—</div>
+                    <div class="analytics-sub">active leads</div>
+                </div>
+                <!-- 5. Deadline Alerts -->
+                <div class="analytics-section">
+                    <div class="analytics-label">Deadline Alerts</div>
+                    <div class="deadline-row">
+                        <div class="deadline-item">
+                            <span class="deadline-window">Within 30 days</span>
+                            <span class="deadline-count urgent" id="dl-30">—</span>
+                        </div>
+                        <div class="deadline-item">
+                            <span class="deadline-window">Within 60 days</span>
+                            <span class="deadline-count warn" id="dl-60">—</span>
+                        </div>
+                        <div class="deadline-item">
+                            <span class="deadline-window">Within 90 days</span>
+                            <span class="deadline-count ok" id="dl-90">—</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="stats-row">
+            <div class="stat-card"><div class="stat-label">Total Leads</div><div class="stat-value" id="stat-total">-</div></div>
+            <div class="stat-card"><div class="stat-label">Active Pipeline</div><div class="stat-value gold" id="stat-active-value">-</div></div>
+            <div class="stat-card"><div class="stat-label">Avg. Score</div><div class="stat-value green" id="stat-avg-score">-</div></div>
+            <div class="stat-card"><div class="stat-label">New</div><div class="stat-value" id="stat-new">-</div></div>
+            <div class="stat-card"><div class="stat-label">Contacted</div><div class="stat-value" id="stat-contacted">-</div></div>
+            <div class="stat-card"><div class="stat-label">Filed</div><div class="stat-value" id="stat-filed">-</div></div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+            <div class="filter-group">
+                <span class="filter-label">Status</span>
+                <select class="filter-select" id="filter-status" onchange="loadLeads()">
+                    <option value="all">All Statuses</option>
+                    <option value="new">New</option>
+                    <option value="contacted">Contacted</option>
+                    <option value="engaged">Engaged</option>
+                    <option value="filed">Filed</option>
+                    <option value="recovered">Recovered</option>
+                    <option value="dead">Dead</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Sale Date From</span>
+                <input type="date" class="filter-input" id="filter-date-from" onchange="loadLeads()">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Sale Date To</span>
+                <input type="date" class="filter-input" id="filter-date-to" onchange="loadLeads()">
+            </div>
+            <div class="filter-group search-box">
+                <span class="filter-label">Search</span>
+                <input type="text" class="filter-input" id="filter-search" placeholder="Name, APN, or address..." oninput="debounceSearch()">
+            </div>
+        </div>
+
+        <!-- Leads Table -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th data-sort="score" class="sorted">Score <span class="sort-arrow">&#9660;</span></th>
+                        <th data-sort="claimant_name">Claimant</th>
+                        <th>APN</th>
+                        <th data-sort="excess_amount">Excess Amount</th>
+                        <th data-sort="sale_date">Sale Date</th>
+                        <th>Deadline</th>
+                        <th data-sort="status">Status</th>
+                        <th title="Contact info available">Contact</th>
+                    </tr>
+                </thead>
+                <tbody id="leads-body">
+                    <tr><td colspan="8" class="empty-state"><div class="loading-shimmer" style="max-width:300px;margin:0 auto;"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Lead Modal -->
+    <div class="modal-overlay" id="add-lead-modal">
+        <div class="modal">
+            <h2>Add New Lead</h2>
+            <form id="add-lead-form" onsubmit="submitLead(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Claimant Name *</label>
+                        <input type="text" name="claimant_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>APN *</label>
+                        <input type="text" name="apn" required placeholder="123-456-78-00">
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Property Address</label>
+                        <input type="text" name="property_address" placeholder="1234 Main St, San Diego, CA">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Excess Amount ($)</label>
+                        <input type="number" name="excess_amount" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Score (0-100)</label>
+                        <input type="number" name="score" min="0" max="100" value="50">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Sale Date</label>
+                        <input type="date" name="sale_date">
+                    </div>
+                    <div class="form-group">
+                        <label>Claim Deadline</label>
+                        <input type="date" name="deadline">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email" placeholder="claimant@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" name="phone" placeholder="(619) 555-0100">
+                    </div>
+                </div>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" placeholder="Any relevant details about this lead..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Lead</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div class="modal-overlay" id="import-csv-modal">
+        <div class="import-modal">
+            <h2>Import Leads from CSV</h2>
+            <p class="modal-subtitle">Upload a CSV file with San Diego County auction data. Leads are auto-scored and deduplicated.</p>
+
+            <div id="import-drop-zone" class="drop-zone">
+                <div class="drop-zone-icon">&#128196;</div>
+                <div class="drop-zone-text">Drag & drop your CSV file here</div>
+                <div class="drop-zone-hint">or click to browse</div>
+                <input type="file" id="import-file-input" accept=".csv,text/csv" style="display:none;">
+            </div>
+
+            <div id="import-file-info" style="display:none;">
+                <div class="file-selected">
+                    <span class="file-selected-icon">&#128196;</span>
+                    <span class="file-selected-name" id="import-file-name"></span>
+                    <span class="file-selected-size" id="import-file-size"></span>
+                    <button class="file-remove" onclick="clearImportFile()" title="Remove">&times;</button>
+                </div>
+            </div>
+
+            <div class="expected-cols">
+                <div class="expected-cols-title">Expected columns</div>
+                <code>county</code>
+                <code>parcel_apn</code>
+                <code>property_address</code>
+                <code>sale_date</code>
+                <code>excess_amount</code>
+                <code>claimant_name</code>
+                <code>claimant_type</code>
+                <code>source_url</code>
+                <code>email</code>
+                <code>phone</code>
+                <code>mailing_address</code>
+                <code>contact_source</code>
+            </div>
+
+            <div class="import-progress" id="import-progress">
+                <div class="import-spinner"></div>
+                <div class="import-progress-text">Importing leads...</div>
+            </div>
+
+            <div class="import-results" id="import-results">
+                <div class="import-results-grid">
+                    <div class="import-result-card">
+                        <div class="import-result-value imported" id="result-imported">0</div>
+                        <div class="import-result-label">Imported</div>
+                    </div>
+                    <div class="import-result-card">
+                        <div class="import-result-value skipped" id="result-duplicates">0</div>
+                        <div class="import-result-label">Duplicates Skipped</div>
+                    </div>
+                    <div class="import-result-card">
+                        <div class="import-result-value errored" id="result-errors">0</div>
+                        <div class="import-result-label">Errors</div>
+                    </div>
+                </div>
+                <div id="import-errors-container"></div>
+            </div>
+
+            <div class="modal-actions" id="import-actions">
+                <button type="button" class="btn btn-ghost" onclick="closeImportModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" id="import-submit-btn" onclick="submitImport()" disabled>Import</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSort = 'score';
+        let currentOrder = 'desc';
+        let searchTimeout = null;
+
+        // ── Pipeline Analytics ──
+        async function loadAnalytics() {
+            try {
+                const res = await fetch('/api/leads/analytics');
+                if (!res.ok) return;
+                const a = await res.json();
+
+                // Pipeline value
+                document.getElementById('ana-pipeline').textContent =
+                    '$' + Number(a.pipeline_value || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+                document.getElementById('ana-active-count').textContent =
+                    (a.active_total || 0) + ' active lead' + (a.active_total === 1 ? '' : 's');
+
+                // Score tiers
+                const tiersEl = document.getElementById('ana-tiers');
+                tiersEl.innerHTML =
+                    `<span class="tier-pill tier-high">${a.tier_high || 0} High</span>` +
+                    `<span class="tier-pill tier-mid">${a.tier_mid || 0} Mid</span>` +
+                    `<span class="tier-pill tier-low">${a.tier_low || 0} Low</span>`;
+
+                // Status counts
+                document.getElementById('sc-new').textContent = a.status_new || 0;
+                document.getElementById('sc-contacted').textContent = a.status_contacted || 0;
+                document.getElementById('sc-engaged').textContent = a.status_engaged || 0;
+                document.getElementById('sc-filed').textContent = a.status_filed || 0;
+                document.getElementById('sc-recovered').textContent = a.status_recovered || 0;
+
+                // Avg score
+                document.getElementById('ana-avg-score').textContent = a.avg_score || 0;
+
+                // Deadline alerts
+                document.getElementById('dl-30').textContent = a.deadline_30 || 0;
+                document.getElementById('dl-60').textContent = a.deadline_60 || 0;
+                document.getElementById('dl-90').textContent = a.deadline_90 || 0;
+
+            } catch (e) { /* silent — bar stays at dashes */ }
+        }
+
+        // ── Data loading ──
+        async function loadStats() {
+            try {
+                const res = await fetch('/api/leads/stats');
+                const s = res.ok ? await res.json() : {};
+                document.getElementById('stat-total').textContent = s.total || 0;
+                document.getElementById('stat-active-value').textContent = '$' + Number(s.active_value || 0).toLocaleString();
+                document.getElementById('stat-avg-score').textContent = s.avg_score || 0;
+                document.getElementById('stat-new').textContent = s.new_count || 0;
+                document.getElementById('stat-contacted').textContent = s.contacted_count || 0;
+                document.getElementById('stat-filed').textContent = s.filed_count || 0;
+            } catch (e) { console.error('Stats error:', e); }
+        }
+
+        async function loadLeads() {
+            const status = document.getElementById('filter-status').value;
+            const dateFrom = document.getElementById('filter-date-from').value;
+            const dateTo = document.getElementById('filter-date-to').value;
+            const search = document.getElementById('filter-search').value;
+
+            const params = new URLSearchParams();
+            if (status !== 'all') params.set('status', status);
+            if (dateFrom) params.set('date_from', dateFrom);
+            if (dateTo) params.set('date_to', dateTo);
+            if (search) params.set('search', search);
+            params.set('sort', currentSort);
+            params.set('order', currentOrder);
+
+            try {
+                const res = await fetch('/api/leads?' + params.toString());
+                const leads = res.ok ? await res.json() : [];
+                renderTable(leads);
+            } catch (e) {
+                console.error('Leads error:', e);
+                document.getElementById('leads-body').innerHTML =
+                    '<tr><td colspan="7" class="empty-state">Failed to load leads.</td></tr>';
+            }
+        }
+
+        function renderTable(leads) {
+            const tbody = document.getElementById('leads-body');
+            if (!leads.length) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No leads found</h3>Adjust your filters or add a new lead.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = leads.map(l => {
+                const scoreClass = l.score >= 80 ? 'score-high' : l.score >= 50 ? 'score-mid' : 'score-low';
+                const saleDate = l.sale_date ? new Date(l.sale_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
+                const deadline = l.deadline ? new Date(l.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '-';
+                const amount = l.excess_amount ? '$' + Number(l.excess_amount).toLocaleString() : '-';
+                const hasContact = !!(l.email || l.phone);
+                const contactDot = hasContact
+                    ? `<span class="contact-dot has-contact" title="${esc((l.email || '') + (l.email && l.phone ? ' · ' : '') + (l.phone || ''))}"></span>`
+                    : `<span class="contact-dot no-contact" title="No contact info"></span>`;
+                return `<tr onclick="window.location='/lead/${l.id}'">
+                    <td class="td-score ${scoreClass}">${l.score}</td>
+                    <td class="td-name">${esc(l.claimant_name || 'Unknown')}</td>
+                    <td class="td-apn">${esc(l.apn)}</td>
+                    <td class="td-amount">${amount}</td>
+                    <td class="td-date">${saleDate}</td>
+                    <td class="td-date">${deadline}</td>
+                    <td><span class="badge badge-${l.status}">${l.status}</span></td>
+                    <td style="text-align:center;">${contactDot}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        // ── Sorting ──
+        document.querySelectorAll('thead th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const col = th.dataset.sort;
+                if (currentSort === col) {
+                    currentOrder = currentOrder === 'desc' ? 'asc' : 'desc';
+                } else {
+                    currentSort = col;
+                    currentOrder = 'desc';
+                }
+                document.querySelectorAll('thead th').forEach(t => {
+                    t.classList.remove('sorted');
+                    const arrow = t.querySelector('.sort-arrow');
+                    if (arrow) arrow.remove();
+                });
+                th.classList.add('sorted');
+                const arrow = document.createElement('span');
+                arrow.className = 'sort-arrow';
+                arrow.innerHTML = currentOrder === 'desc' ? '&#9660;' : '&#9650;';
+                th.appendChild(arrow);
+                loadLeads();
+            });
+        });
+
+        // ── Search debounce ──
+        function debounceSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(loadLeads, 300);
+        }
+
+        // ── Modal ──
+        function openModal() { document.getElementById('add-lead-modal').classList.add('active'); }
+        function closeModal() {
+            document.getElementById('add-lead-modal').classList.remove('active');
+            document.getElementById('add-lead-form').reset();
+        }
+
+        async function submitLead(e) {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                claimant_name: form.claimant_name.value,
+                apn: form.apn.value,
+                property_address: form.property_address.value,
+                excess_amount: form.excess_amount.value ? parseFloat(form.excess_amount.value) : null,
+                score: parseInt(form.score.value) || 50,
+                sale_date: form.sale_date.value || null,
+                deadline: form.deadline.value || null,
+                notes: form.notes.value || null,
+                email: form.email.value || null,
+                phone: form.phone.value || null,
+                county: 'San Diego',
+            };
+            try {
+                const res = await fetch('/api/leads', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+                if (res.ok) {
+                    // Fire Meta Pixel Lead event on successful lead creation
+                    if (typeof fbq === 'function') fbq('track', 'Lead');
+                    closeModal();
+                    loadLeads();
+                    loadStats();
+                    loadAnalytics();
+                } else {
+                    alert('Failed to create lead');
+                }
+            } catch (err) { alert('Error: ' + err.message); }
+        }
+
+        // Close modal on overlay click
+        document.getElementById('add-lead-modal').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+        // ── Import CSV ──
+        let importFile = null;
+
+        function openImportModal() {
+            importFile = null;
+            document.getElementById('import-csv-modal').classList.add('active');
+            document.getElementById('import-drop-zone').style.display = '';
+            document.getElementById('import-file-info').style.display = 'none';
+            document.getElementById('import-progress').classList.remove('active');
+            document.getElementById('import-results').classList.remove('active');
+            document.getElementById('import-submit-btn').disabled = true;
+            document.getElementById('import-submit-btn').textContent = 'Import';
+            document.getElementById('import-actions').querySelector('.btn-ghost').textContent = 'Cancel';
+            document.getElementById('import-errors-container').innerHTML = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('import-csv-modal').classList.remove('active');
+            importFile = null;
+        }
+
+        function clearImportFile() {
+            importFile = null;
+            document.getElementById('import-drop-zone').style.display = '';
+            document.getElementById('import-file-info').style.display = 'none';
+            document.getElementById('import-submit-btn').disabled = true;
+            document.getElementById('import-file-input').value = '';
+        }
+
+        function setImportFile(file) {
+            if (!file || !file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a .csv file');
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File too large. Maximum 10MB.');
+                return;
+            }
+            importFile = file;
+            document.getElementById('import-drop-zone').style.display = 'none';
+            document.getElementById('import-file-info').style.display = 'block';
+            document.getElementById('import-file-name').textContent = file.name;
+            document.getElementById('import-file-size').textContent =
+                file.size < 1024 ? file.size + ' B' :
+                file.size < 1048576 ? (file.size / 1024).toFixed(1) + ' KB' :
+                (file.size / 1048576).toFixed(1) + ' MB';
+            document.getElementById('import-submit-btn').disabled = false;
+        }
+
+        // Drag & drop
+        const dropZone = document.getElementById('import-drop-zone');
+        dropZone.addEventListener('click', () => document.getElementById('import-file-input').click());
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) setImportFile(e.dataTransfer.files[0]);
+        });
+        document.getElementById('import-file-input').addEventListener('change', e => {
+            if (e.target.files.length) setImportFile(e.target.files[0]);
+        });
+
+        // Close on overlay click
+        document.getElementById('import-csv-modal').addEventListener('click', e => {
+            if (e.target === e.currentTarget) closeImportModal();
+        });
+
+        async function submitImport() {
+            if (!importFile) return;
+
+            // Show progress
+            document.getElementById('import-submit-btn').disabled = true;
+            document.getElementById('import-progress').classList.add('active');
+            document.getElementById('import-results').classList.remove('active');
+            document.getElementById('import-drop-zone').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', importFile);
+
+            try {
+                const res = await fetch('/api/leads/import', { method: 'POST', body: formData });
+                const data = await res.json();
+
+                document.getElementById('import-progress').classList.remove('active');
+
+                if (!res.ok) {
+                    alert(data.error || 'Import failed');
+                    document.getElementById('import-submit-btn').disabled = false;
+                    return;
+                }
+
+                // Show results
+                document.getElementById('import-results').classList.add('active');
+                document.getElementById('result-imported').textContent = data.imported;
+                document.getElementById('result-duplicates').textContent = data.duplicates;
+                document.getElementById('result-errors').textContent = data.errors;
+
+                // Show error details if any
+                const errContainer = document.getElementById('import-errors-container');
+                if (data.error_details && data.error_details.length > 0) {
+                    errContainer.innerHTML = '<div class="import-errors-list">' +
+                        data.error_details.map(e =>
+                            `<div class="import-error-row"><span>Row ${e.row}:</span> ${esc(e.reason)}</div>`
+                        ).join('') + '</div>';
+                } else {
+                    errContainer.innerHTML = '';
+                }
+
+                // Switch buttons to Done
+                document.getElementById('import-submit-btn').textContent = 'Done';
+                document.getElementById('import-submit-btn').disabled = false;
+                document.getElementById('import-submit-btn').onclick = function() {
+                    closeImportModal();
+                    loadLeads();
+                    loadStats();
+                    this.onclick = submitImport; // Reset for next time
+                };
+                document.getElementById('import-actions').querySelector('.btn-ghost').style.display = 'none';
+
+                // Refresh dashboard data
+                loadLeads();
+                loadStats();
+                loadAnalytics();
+            } catch (err) {
+                document.getElementById('import-progress').classList.remove('active');
+                alert('Import error: ' + err.message);
+                document.getElementById('import-submit-btn').disabled = false;
+            }
+        }
+
+        // ── Init ──
+        loadAnalytics();
+        loadStats();
+        loadLeads();
+    </script>
+</body>
+</html>
